@@ -1,0 +1,113 @@
+/**
+ * Created by san on 2019年1月7日, 0007.
+ */
+const {resolve} = require('path')
+const HtmlWebpackPlugin = require('html-webpack-plugin')
+const CleanWebpackPlugin = require('clean-webpack-plugin')
+const ExtractTextPlugin = require('extract-text-webpack-plugin')
+
+module.exports = {
+  entry: './src/js/index.js',
+
+  output: {
+    path: resolve(__dirname, 'build'),
+    filename: './js/index.js'
+  },
+
+  module: {
+    rules: [
+      //旧版file-loader
+
+      // {
+      //   test: /\.(png|jpg|gif)$/,
+      //   use: [
+      //     {
+      //       loader: 'file-loader',
+      //       options: {
+      //         outputPath: 'img',
+      //         publicPath: './build/img',
+      //         name: '[hash:5].[ext]'
+      //       },
+      //
+      //     }
+      //   ]
+      // },
+
+      //图片
+      {
+        test: /\.(png|jpg|gif)$/,
+        use: [
+          {
+            loader: 'url-loader',
+            options: {
+              limit: 8192,
+              outputPath: 'img',
+              publicPath: '../img',
+              name: '[hash:5].[ext]'
+            }
+          }
+        ]
+      },
+
+      //jslint语法检查
+
+      // {
+      //   test: /\.js$/, // 涵盖 .js 文件
+      //   enforce: "pre", // 预先加载好 jshint loader
+      //   exclude: /node_modules/, // 排除掉 node_modules 文件夹下的所有文件
+      //   use: [
+      //     {
+      //       loader: "jshint-loader",
+      //       options: {
+      //         emitErrors: true,
+      //
+      //       }
+      //     }
+      //   ]
+      // },
+
+//    编译less
+      {
+        test: /\.less$/,
+        use: ExtractTextPlugin.extract({
+          fallback: 'style-loader',
+          use: ['css-loader', 'less-loader']
+        })
+      },
+
+      //ES6 to ES5
+      {
+        test: /\.js$/,
+        exclude: /(node_modules)/,
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['es2015']
+          }
+        }
+      },
+
+      //html 清理
+
+    ],
+
+  },
+
+  plugins: [
+    //html auto generate
+    new HtmlWebpackPlugin({
+      title: 'webpack',
+      filename: 'index.html',
+      template: 'index.html'
+    }),
+
+
+    //提取合并css
+    new ExtractTextPlugin('./css/index.css'),
+    new CleanWebpackPlugin('./build'),
+
+    //clean useless file
+    new CleanWebpackPlugin('./build')
+  ]
+
+}
